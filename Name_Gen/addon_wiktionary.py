@@ -136,91 +136,122 @@ def add_male_names(nations):
 def add_female_names(df, nations, next_page, pages_vistited):
 
     print(pages_vistited)
+    print("Current df is ", df)
+    print("Next page is ", next_page)
 
 
-    for i in range(len(nations)):
-        divide = False
-        argument = "https://en.wiktionary.org/wiki/Category:{}_female_given_names".format(nations[i])
-        if next_page is not None:
-            argument = next_page
-            if next_page not in pages_vistited:
-                pages_vistited.append(next_page)
-            else:
-                break
 
-        print(argument)
-        file = requests.get(argument)
-        print(str(file), "Iteration is {}".format(i), nations[i])
-        #print("This has updated")
-        #print(str(file))
-        if str(file) == "<Response [404]>":
-            pass
-        elif str(file) == "<Response [200]>":
-            #print("Also updated")
-            soup = BeautifulSoup(file.content, "lxml")
-            div_tag = soup.find_all("div", {"id": "mw-pages"})
-            for tag in div_tag:
-                rec_data = tag.find_all("li")
-                item_txt = ""
+    divide = False
+    argument = "https://en.wiktionary.org/wiki/Category:{}_female_given_names".format(nations[0])
+    if next_page is not None:
+        argument = next_page
+        if next_page not in pages_vistited:
+            pages_vistited.append(next_page)
 
-                for item in rec_data:
-                    item_txt = item.string
-                    print(item_txt)
-                    origins = nations[i]
-                    print(origins)
+
+    print(argument)
+    file = requests.get(argument)
+    print(str(file), "Iteration is {}".format(nations), nations[0])
+    #print("This has updated")
+    #print(str(file))
+    if str(file) == "<Response [404]>":
+        pass
+    elif str(file) == "<Response [200]>":
+
+        #print("Also updated")
+        soup = BeautifulSoup(file.content, "lxml")
+        div_tag = soup.find_all("div", {"id": "mw-pages"})
+        for tag in div_tag:
+            rec_data = tag.find_all("li")
+            item_txt = ""
+
+            for item in rec_data:
+                item_txt = item.string
+                print(item_txt)
+                origins = nations[0]
+                print(origins)
+                try:
+                    item = item.string.split("(")[0]  # Incase of any disambiguations or other issues
+                except:
+                    pass
+                if any(re.findall(r"Appendix|learn more|previous|List|Surnames|name|Mobile|Cookie", item, re.IGNORECASE)):
+                    print("Invalid name: ", item)
+                    continue
+                if item_txt is None:
                     try:
-                        item = item.string.split("(")[0]  # Incase of any disambiguations or other issues
-                        name=item
+                        print(item.text)
+                        item_split = item.text.split(" ")
+                        item_txt = item_split[0]
+                        item_txt = re.sub(r"([A-Z])", r" \1", item_txt).split()
+                        item_txt = item_txt[0]
+                        item_txt = item_txt.strip()
                     except:
                         pass
-                    if any(re.findall(r"Appendix|learn more|previous|List|Surnames|name|Mobile|Cookie", item, re.IGNORECASE)):
-                        print("Invalid name: ", item)
-                        continue
-                    if item_txt is None:
-                        try:
-                            print(item.text)
-                            item_split = item.text.split(" ")
-                            item_txt = item_split[0]
-                            item_txt = re.sub(r"([A-Z])", r" \1", item_txt).split()
-                            item_txt = item_txt[0]
-                            item_txt = item_txt.strip()
-                        except:
-                            pass
-                    print(item)
-                    print("Divided text: ", item_txt)
-                    if any(re.findall(r"Appendix|learn more|previous|List|Surnames|name|Mobile|Cookie", item, re.IGNORECASE)):
-                        print("Invalid name: ", item)
-                        break
-                    elif item_txt is not None:
-                        adder = str(item_txt)
-                        parts = re.split(r'[;,\s]\s*', adder)  # removes any double names that are not hyphinated
-                        print(parts)
-                        adder = parts[0]
-                        if not adder.strip():
-                            print("Not Found")
-                            pass
-                        print(adder)
-                        df = df.append({"name": adder, "tag": "F", "origin": origins},
-                                           ignore_index=True)
-
+                print(item)
+                print("Divided text: ", item_txt)
+                if any(re.findall(r"Appendix|learn more|previous|List|Surnames|name|Mobile|Cookie", item, re.IGNORECASE)):
+                    print("Invalid name: ", item)
+                    break
+                elif item_txt is not None:
+                    adder = str(item_txt)
+                    parts = re.split(r'[;,\s]\s*', adder)  # removes any double names that are not hyphinated
+                    print(parts)
+                    adder = parts[0]
+                    if not adder.strip():
+                        print("Not Found")
+                        pass
+                    print(adder)
+                    df = df.append({"name": adder, "tag": "F", "origin": origins},
+                                       ignore_index=True)
+            print("Current Df is ", df)
+            print("starting to look for links")
             a_tag = soup.find_all("a", href=True)
+            final_df = df
+            print("Outside Current Df is ", final_df)
+            
+
             for a_link in a_tag:
+                #print(a_link)
                 try:
+                    if "https://en.wiktionary.org"+ a_link["href"] in pages_vistited:
+                            print("This has been visited")
+                            return final_df
                     if "next page" in a_link.string:
+                        print("The link is" ,a_link, argument, a_link["href"])
+
+
+                        print("Current Df is ", final_df)
+                        print(pages_vistited)
+                        print(a_link["href"])
                         print("There is a page in the tag: {}".format("https://en.wiktionary.org" + a_link["href"]))
-                        add_female_names(df, nations, next_page="https://en.wiktionary.org" + a_link["href"], pages_vistited= pages_vistited)
+                        page_in_tag = "https://en.wiktionary.org" + a_link["href"]
+                        print(final_df)
+                        print(page_in_tag)
+                        if page_in_tag in pages_vistited:
+
+                            print("page was already visited")
+                            print(final_df)
+                            break
+                        elif page_in_tag not in pages_vistited:
+                            add_female_names(df, nations, next_page="https://en.wiktionary.org" + a_link["href"], pages_vistited= pages_vistited)
+
+
                 except:
                     break
-        print(df)
+
+
+
+    print("Its a df + ", df)
         # for e in nations:
         #     print(e)
         #     g = df.loc[df["origin"] == e]
         #     print("DF IS + {}".format(e), g)
         #     print(g, g["tag"].value_counts())
 
-        return df
+
 
 
 df = pd.DataFrame(columns=["name", "tag", "origin"])
 df = add_female_names(df, nations, next_page=None, pages_vistited=[])
 print(df)
+
