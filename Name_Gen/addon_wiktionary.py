@@ -137,83 +137,74 @@ def add_female_names(df, nations, next_page, pages_vistited):
 
     print(pages_vistited)
 
+    for n in range(len(nations)):
 
+        divide = False
+        argument = "https://en.wiktionary.org/wiki/Category:{}_female_given_names".format(nations[n])
+        file = requests.get(argument)
+        pages = [argument]
+        pages_found = look_for_pages(file, pages)
+        #Loop through pages and retrieve names
+        print("pages that have been found", pages_found)
 
-    divide = False
-    argument = "https://en.wiktionary.org/wiki/Category:{}_female_given_names".format(nations[0])
-    file = requests.get(argument)
-    pages = [argument]
-    pages_found = look_for_pages(file, pages)
-    #Loop through pages and retrieve names
-    print("pages that have been found", pages_found)
+        print(str(file), "Iteration is {}".format(nations), nations[n])
+        #print("This has updated")
+        #print(str(file))
+        for page in pages_found:
+            argument = page
+            file = requests.get(argument)
+            if str(file) == "<Response [404]>":
+                pass
+            elif str(file) == "<Response [200]>":
+                #print("Also updated")
+                soup = BeautifulSoup(file.content, "lxml")
+                div_tag = soup.find_all("div", {"id": "mw-pages"})
+                for tag in div_tag:
+                    rec_data = tag.find_all("li")
+                    item_txt = ""
 
-    if next_page is not None:
-        argument = next_page
-        if next_page not in pages_vistited:
-            pages_vistited.append(next_page)
-
-
-
-
-    print(str(file), "Iteration is {}".format(nations), nations[0])
-    #print("This has updated")
-    #print(str(file))
-    if str(file) == "<Response [404]>":
-        pass
-    elif str(file) == "<Response [200]>":
-        for pages in pages_found:
-
-            #print("Also updated")
-            soup = BeautifulSoup(file.content, "lxml")
-            div_tag = soup.find_all("div", {"id": "mw-pages"})
-            for tag in div_tag:
-                rec_data = tag.find_all("li")
-                item_txt = ""
-
-                for item in rec_data:
-                    item_txt = item.string
-                    print(item_txt)
-                    origins = nations[0]
-                    print(origins)
-                    try:
-                        item = item.string.split("(")[0]  # Incase of any disambiguations or other issues
-                    except:
-                        pass
-                    if any(re.findall(r"Appendix|learn more|previous|List|Surnames|name|Mobile|Cookie", item, re.IGNORECASE)):
-                        print("Invalid name: ", item)
-                        continue
-                    if item_txt is None:
+                    for item in rec_data:
+                        item_txt = item.string
+                        print(item_txt)
+                        origins = nations[n]
+                        print(origins)
                         try:
-                            print(item.text)
-                            item_split = item.text.split(" ")
-                            item_txt = item_split[0]
-                            item_txt = re.sub(r"([A-Z])", r" \1", item_txt).split()
-                            item_txt = item_txt[0]
-                            item_txt = item_txt.strip()
+                            item = item.string.split("(")[0]  # Incase of any disambiguations or other issues
                         except:
                             pass
-                    print(item)
-                    print("Divided text: ", item_txt)
-                    if any(re.findall(r"Appendix|learn more|previous|List|Surnames|name|Mobile|Cookie", item, re.IGNORECASE)):
-                        print("Invalid name: ", item)
-                        break
-                    elif item_txt is not None:
-                        adder = str(item_txt)
-                        parts = re.split(r'[;,\s]\s*', adder)  # removes any double names that are not hyphinated
-                        print(parts)
-                        adder = parts[0]
-                        if not adder.strip():
-                            print("Not Found")
-                            pass
-                        print(adder)
-                        df = df.append({"name": adder, "tag": "F", "origin": origins},
-                                           ignore_index=True)
-                print("Current Df is ", df)
-                print("starting to look for links")
-                a_tag = soup.find_all("a", href=True)
-                final_df = df
-                print("Outside Current Df is ", final_df)
+                        if any(re.findall(r"Appendix|learn more|previous|List|Surnames|name|Mobile|Cookie", item, re.IGNORECASE)):
+                            print("Invalid name: ", item)
+                            continue
+                        if item_txt is None:
+                            try:
+                                print(item.text)
+                                item_split = item.text.split(" ")
+                                item_txt = item_split[0]
+                                item_txt = re.sub(r"([A-Z])", r" \1", item_txt).split()
+                                item_txt = item_txt[0]
+                                item_txt = item_txt.strip()
+                            except:
+                                pass
+                        print(item)
+                        print("Divided text: ", item_txt)
+                        if any(re.findall(r"Appendix|learn more|previous|List|Surnames|name|Mobile|Cookie", item, re.IGNORECASE)):
+                            print("Invalid name: ", item)
+                            break
+                        elif item_txt is not None:
+                            adder = str(item_txt)
+                            parts = re.split(r'[;,\s]\s*', adder)  # removes any double names that are not hyphinated
+                            print(parts)
+                            adder = parts[0]
+                            if not adder.strip():
+                                print("Not Found")
+                                pass
+                            print(adder)
+                            df = df.append({"name": adder, "tag": "F", "origin": origins},
+                                               ignore_index=True)
+                    print("Current Df is ", df)
 
+        print(df)
+    return df
 
 def look_for_pages(file, pages):
     soup = BeautifulSoup(file.content, "lxml")
