@@ -136,16 +136,17 @@ def add_male_names(nations):
 def add_female_names(df, nations, next_page, pages_vistited):
 
     print(pages_vistited)
-    print("Current df is ", df)
-    print("Next page is ", next_page)
 
 
 
     divide = False
     argument = "https://en.wiktionary.org/wiki/Category:{}_female_given_names".format(nations[0])
     file = requests.get(argument)
-    pages_found = look_for_pages(file, argument)
-    print(pages_found)
+    pages = [argument]
+    pages_found = look_for_pages(file, pages)
+    #Loop through pages and retrieve names
+    print("pages that have been found", pages_found)
+
     if next_page is not None:
         argument = next_page
         if next_page not in pages_vistited:
@@ -214,10 +215,10 @@ def add_female_names(df, nations, next_page, pages_vistited):
                 print("Outside Current Df is ", final_df)
 
 
-def look_for_pages(file, start_page):
+def look_for_pages(file, pages):
     soup = BeautifulSoup(file.content, "lxml")
     a_tag = soup.find_all("a", href=True)
-    pages = [start_page]
+
     for a_link in a_tag:
 
         # print(a_link)
@@ -225,12 +226,15 @@ def look_for_pages(file, start_page):
 
             if "next page" in a_link.string:
                 print("The link is", a_link, file, a_link["href"])
+                print(pages)
                 print("There is a page in the tag: {0} \n {1}".format("https://en.wiktionary.org" + a_link["href"],
                                                                       file))
                 if "https://en.wiktionary.org" + a_link["href"] not in pages:
                     pages.append("https://en.wiktionary.org" + a_link["href"])
                     page_in_tag = "https://en.wiktionary.org" + a_link["href"]
                     print(page_in_tag)
+                    file = requests.get(page_in_tag)
+                    look_for_pages(file, pages)
 
 
 
