@@ -8,6 +8,7 @@ from transliterate import translit, detect_language
 import time
 from unidecode import unidecode
 from Name_Gen import addon_wiktionary
+import sqlite3
 
 # This addon pack focuses on the application of current and historic data to create more organic naming conventions for NPC's
 # The following dataset will act as an anchor for this https://www.ssb.no/en/navn#renderAjaxBanner
@@ -347,8 +348,9 @@ def splice_names():
     df_bs4 = soup_names()
     print(df_bs4, pd.unique(df_bs4["origin"]))
     df_surnames = soup_surnames()
+    df_fantasy = pd.read_csv("fantasy.csv")
 
-    frames = [df, df_bs4, df_surnames]
+    frames = [df, df_bs4, df_surnames, df_fantasy]
     df_full = pd.concat(frames, ignore_index=True)
     df_full["name"] = df_full["name"].str.replace("\w{L}+", "")
     df_full["name"] = df_full["name"].replace("", np.nan)
@@ -848,4 +850,37 @@ def form_files(data):
     # Continue Later
     # data.to_sql()
 
-splice_names()
+def check_counts():
+    if os.path.exists("names_merged.xlsx"):
+        print("Final output exists, proceeding")
+        df = pd.read_excel("names_merged.xlsx")
+        tags = list(pd.unique(df["origin"]))
+        for g in tags:
+            nation_df = df[df["origin"] == g]
+            print("Nationality: {0} \nContains: {1} Values\n {2}".format(g, nation_df.size, nation_df["tag"].value_counts()))
+
+    else:
+        print("Final output does not exist, please create the file using splice names function")
+
+def move_to_sql():
+    if os.path.exists("names_merged.xlsx"):
+        #print("Final output exists, proceeding")
+        df = pd.read_excel("names_merged.xlsx")
+        #print(df)
+        conn = sqlite3.connect("names_merged.db")
+        c = conn.cursor()
+        c.execute('CREATE TABLE NAMES (name text, tag text, origin text)')
+        conn.commit()
+        df.to_sql('NAMES', conn, if_exists='replace', index = False)
+        new_df = pd.read_sql(sql='SELECT * FROM NAMES', con=conn)
+        #print(new_df)
+
+def get_sql_names():
+    try:
+        conn = sqlite3.connect("names_merged.db")
+        c = conn.cursor()
+        new_df = pd.read_sql(sql='SELECT * FROM NAMES', con=conn)
+        return new_df
+    except:
+        print("Something went wrong")
+
