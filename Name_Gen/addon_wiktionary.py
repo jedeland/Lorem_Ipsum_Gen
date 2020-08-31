@@ -77,7 +77,7 @@ def add_names(df, name_div, name_fin, nation_abrev, nations, probable_formats):
 
     return df
 
-def add_male_names(df, nations, next_page, pages_visited):
+def add_male_names(df, nations, pages_visited):
 
     print(pages_visited)
 
@@ -151,7 +151,7 @@ def add_male_names(df, nations, next_page, pages_visited):
 
         print(df)
     return df
-def add_female_names(df, nations, next_page, pages_visited):
+def add_female_names(df, nations, pages_visited):
 
     print(pages_visited)
 
@@ -229,7 +229,7 @@ def add_surnames(df, nations, pages_visited):
     for n in range(len(nations)):
 
         divide = False
-        argument = "https://en.wiktionary.org/wiki/Category:{}-language_surnames".format(nations[n])
+        argument = "https://en.wiktionary.org/wiki/Category:{}_surnames".format(nations[n])
         file = requests.get(argument)
         pages = [argument]
         pages_found = look_for_pages(file, pages)
@@ -320,11 +320,11 @@ def add_wiktionary_names():
 
     nations = ["French", "Italian", "Spanish", "Turkish", "Dutch", "Swedish", "Polish", "Serbian", "Irish",
                    "Czech", "Hungarian", "Russian", "Romanian", "Persian", "Basque", "Armenian",
-                   "German", "English", "Latvian", "Lithuanian", "Estonian", "Latin"]
+                   "German", "English", "Latvian", "Lithuanian", "Estonian", "Latin", "Japanese"]
     df = pd.DataFrame(columns=["name", "tag", "origin"])
-    df = add_female_names(df, nations, next_page=None, pages_visited=[])
-    df = add_male_names(df, nations, next_page=None, pages_visited=[])
-    df = add_surnames(df, nations, next_page=None, pages_visited=[])
+    df = add_female_names(df, nations, pages_visited=[])
+    df = add_male_names(df, nations, pages_visited=[])
+    #df = add_surnames(df, nations, pages_visited=[])
 
     return df
 
