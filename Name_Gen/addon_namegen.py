@@ -8,7 +8,7 @@ from transliterate import translit, detect_language
 import time
 from unidecode import unidecode
 from Name_Gen import addon_wiktionary
-import sqlite3
+import sqlite3; import random
 
 # This addon pack focuses on the application of current and historic data to create more organic naming conventions for NPC's
 # The following dataset will act as an anchor for this https://www.ssb.no/en/navn#renderAjaxBanner
@@ -884,3 +884,27 @@ def get_sql_names():
     except:
         print("Something went wrong")
 
+def find_location_names(number_of_values=55):
+    conn = sqlite3.connect("gen_townnames_.db")
+    c = conn.cursor()
+    df = pd.read_sql(sql='SELECT * FROM NAMES', con=conn)
+
+    european_group = ['Albania', 'Austria', 'Belarus', 'Belgium', 'Bulgaria', 'Croatia', 'Czech Republic', 'Estonia', 'Finland', 'France',
+    'Germany', 'Greece', 'Hungary','Ireland',
+    'Italy', 'Kosovo', 'Latvia', 'Luxembourg', 'Macedonia',
+    'Malta', 'Netherlands', 'Norway','Poland', 'Portugal',
+    'Romania', 'Russia', 'Serbia', 'Slovakia', 'Slovenia',
+    'Spain', 'Sweden', 'Switzerland','Turkey',
+    'Ukraine', 'United Kingdom']
+    df = df[df["Origin"].isin(european_group)]
+    print(df)
+    print(pd.unique(df["Origin"]))
+    df_culture = df[df["Origin"] == random.choice(pd.unique(df["Origin"]))]
+    out_value = df_culture.sample(number_of_values)
+    print(out_value)
+    location_dict = {"{}".format(df_culture["Origin"].iloc[0]) : out_value["Name"].to_list()}
+    print(location_dict)
+    return location_dict
+
+
+find_location_names()
