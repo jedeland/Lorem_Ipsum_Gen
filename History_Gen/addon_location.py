@@ -1,3 +1,6 @@
+import numpy as np
+import binarytree
+from Name_Gen.addon_namegen import find_location_names
 class Location:
     """
     This class should be used to create a location in the main running portion, the locations should have a name, type(town, country, duchy, village ect.), population, situation(recently invaded, prosperous, new ruler, quests) and customs
@@ -20,6 +23,8 @@ class Location:
                         5: ["Town", "Castle", "University Town", "Market Town", "Grand Harbour", "Renowned Suburb"], 6: ["Village", "Fief", "Abbey", "Fortification", "Barony", "Barracks"],
                         7: ["Hamlet", "Settlement", "Hunters Lodge", "Outpost", "Chapel"]}
         target_culture = culture
+
+
     def get_neighbouring_regions(self, region_nodes, neighbours):
         if region_nodes:
             print("Regions have been created, connecting new location to others")
@@ -29,6 +34,11 @@ class Location:
 
 def initialise_regions():
     #import namegen functions and name binary trees after generated regions, create single use name generator based on european names and add the name and respective culture to binary tree to be used in setting regions
-    region_number = 
+    region_size = np.random.randint(5, 55)
+    binary_dict = find_location_names(region_size)
+    print(binary_dict)
     binary_trees = {}
-    for i in range(10):
+    for i in range(region_size):
+        print(i)
+
+initialise_regions()
