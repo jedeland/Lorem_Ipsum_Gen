@@ -26,6 +26,9 @@ class Character:
 
         print("Creating new character")
 
+    def get_background(self, family):
+        #TODO: add backgrounds yaml file with varying backgrounds
+        backgrounds = []
     def check_family(self, family):
         #METHOD: checks the families in a region, if the last name exists then it either adds the characer to the family or creates a new cadet branch, else it creates a new family
         town_groups = []
