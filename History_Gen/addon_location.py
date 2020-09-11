@@ -41,27 +41,22 @@ def initialise_regions():
     new_list = list(binary_dict.values())[0] #Returns list within list
     print("Culture of the new region is {} and the following towns {}".format(culture, new_list))
     print(new_list[0], str(culture))
-
     print(binary_dict)
     tree = nx.Graph()
     for i in range(region_size):
         distance = np.random.randint(1,10)
         connections = np.random.randint(1,4)
         other_town = list(tree.nodes)
-        print(other_town)
-        print(new_list[i])
+
         town = new_list[i]
         tree.add_node(town)
         if tree.number_of_nodes() > 3:
             print("Tree has {} nodes".format(len(list(tree.nodes))))
             for x in range(connections):
-                print(other_town[x], town)
-                tree.add_edges_from([town, other_town[x]])
-
-
-
-
+                arg_tuple = (town, other_town[x])
+                tree.add_edge(town, other_town[x], weight=distance)
     plt.figure()
+
     nx.draw_networkx(tree)
     plt.show()
 
