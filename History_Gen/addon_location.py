@@ -1,6 +1,7 @@
 import numpy as np
-import binarytree
+import networkx as nx
 from Name_Gen.addon_namegen import find_location_names
+import matplotlib.pyplot as plt
 class Location:
     """
     This class should be used to create a location in the main running portion, the locations should have a name, type(town, country, duchy, village ect.), population, situation(recently invaded, prosperous, new ruler, quests) and customs
@@ -36,9 +37,32 @@ def initialise_regions():
     #import namegen functions and name binary trees after generated regions, create single use name generator based on european names and add the name and respective culture to binary tree to be used in setting regions
     region_size = np.random.randint(5, 55)
     binary_dict = find_location_names(region_size)
+    culture = list(binary_dict.keys())[0]
+    new_list = list(binary_dict.values())[0] #Returns list within list
+    print("Culture of the new region is {} and the following towns {}".format(culture, new_list))
+    print(new_list[0], str(culture))
+
     print(binary_dict)
-    binary_trees = {}
+    tree = nx.Graph()
     for i in range(region_size):
-        print(i)
+        distance = np.random.randint(1,10)
+        connections = np.random.randint(1,4)
+        other_town = list(tree.nodes)
+        print(other_town)
+        print(new_list[i])
+        town = new_list[i]
+        tree.add_node(town)
+        if tree.number_of_nodes() > 3:
+            print("Tree has {} nodes".format(len(list(tree.nodes))))
+            for x in range(connections):
+                print(other_town[x], town)
+                tree.add_edges_from([town, other_town[x]])
+
+
+
+
+    plt.figure()
+    nx.draw_networkx(tree)
+    plt.show()
 
 initialise_regions()
