@@ -20,15 +20,15 @@ class Location:
         self.__dict__.update(kwargs)
         print("This function initialises a region")
         print(kwargs, list(kwargs))
-        regional_check = kwargs["settlment_type"]
+        regional_check = kwargs["settlement_type"]
         culture = kwargs["culture"]
-        self.region = self.set_region(regional_check = regional_check, culture= culture)
 
-    def set_region(self, regional_check, culture):
+
+    def get_type(self, regional_check, culture):
         #Region types are ranked numerically, to ensure seperate regions can be randomly assigned names
         #Scope of the regions will go from 1 - 7, starting with kingdom and ending with hamlet / outpost
         region_types = {1: ["Kingdom", "State", "Lordship", "Grand Duchy", "Viceroyalty"], 2: ["Duchy", "Earldom", "Knezevina", "Duché", "Herzogtum", "Grand Cities", "Principality"],
-                        3: ["County", "Earldom", "League Territory", "Grafschaft", "Comitat"], 4: ["City", "Grand Fortress", "Grand Library", "Capital", "Imperial Free City"],
+                        3: ["County", "Earldom", "League Territory", "Grafschaft", "Comitat"], 4: ["City", "Grand Fortress", "Grand Library", "Grand City", "Imperial Free City"],
                         5: ["Town", "Castle", "University Town", "Market Town", "Grand Harbour", "Renowned Suburb"], 6: ["Village", "Fief", "Abbey", "Fortification", "Barony", "Barracks"],
                         7: ["Hamlet", "Settlement", "Hunters Lodge", "Outpost", "Chapel"]}
         target_culture = culture
@@ -69,7 +69,7 @@ def initialise_regions():
         other_town = list(tree.nodes)
 
         town = new_list[i]
-        holding = Holding(name=town, culture = culture, settlment_type = settlment_type)
+        holding = Holding(name=town, culture = culture, settlement_type = Holding.get_type(town, settlment_type, culture))
         object_tree.add_node(holding.name)
         if object_tree.number_of_nodes() > 3:
             print("Tree has {} nodes".format(len(list(object_tree.nodes))))
