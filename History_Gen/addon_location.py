@@ -24,44 +24,56 @@ class Location:
         culture = kwargs["culture"]
 
 
-    def get_type(self, regional_check, culture):
+    def get_town_type(self, regional_check, culture):
         #Region types are ranked numerically, to ensure seperate regions can be randomly assigned names
-        #Scope of the regions will go from 1 - 7, starting with kingdom and ending with hamlet / outpost
-        region_types = {1: ["Kingdom", "State", "Lordship", "Grand Duchy", "Viceroyalty"], 2: ["Duchy", "Earldom", "Knezevina", "Duché", "Herzogtum", "Grand Cities", "Principality"],
-                        3: ["County", "Earldom", "League Territory", "Grafschaft", "Comitat"], 4: ["City", "Grand Fortress", "Grand Library", "Grand City", "Imperial Free City"],
+        #Scope of the regions will go from 4 - 7, starting with City and ending with hamlet / outpost - Refactored from previous version
+        #TODO: Add names to a YAML file in similar fashion to JSON
+        town_region_types = {4: ["City", "Grand Fortress", "Grand Library", "Grand City", "Imperial Free City"],
                         5: ["Town", "Castle", "University Town", "Market Town", "Grand Harbour", "Renowned Suburb"], 6: ["Village", "Fief", "Abbey", "Fortification", "Barony", "Barracks"],
                         7: ["Hamlet", "Settlement", "Hunters Lodge", "Outpost", "Chapel"]}
         target_culture = culture
-        regions = region_types.get(regional_check)
+        regions = town_region_types.get(regional_check)
         region = random.choice(regions)
         print(region)
         return region
+
+    def get_region_type(self, regional_check, culture):
+        regional_types = {1: ["Kingdom", "State", "Lordship", "Grand Duchy", "Viceroyalty"], 2: ["Duchy", "Earldom", "Knezevina", "Duché", "Herzogtum", "Grand Cities", "Principality"],
+                        3: ["County", "Earldom", "League Territory", "Grafschaft", "Comitat"],}
 
 
     def get_neighbouring_regions(self, region_nodes, neighbours):
         if region_nodes:
             print("Regions have been created, connecting new location to others")
         else:
-            initialise_regions()
+            initialise_holdings()
 
 class Holding(Location):
     #Testing args should contain, name, culture, region number (returns region)
     holding = Location
-    print(holding)
 
-
+class Region(Location):
+    region = Location
+    
 def initialise_regions():
+    #Use dictionary to create regions that hold an NX graph and subdictionary containing the holdings relative to a region
+    #regions are a division of a kingdom
+    region_size = np.random.randint(5, 11)
+    binary_dict = load_names(region_size)
+
+
+
+def initialise_holdings():
     #import namegen functions and name binary trees after generated regions, create single use name generator based on european names and add the name and respective culture to binary tree to be used in setting regions
-    region_size = np.random.randint(5, 55)
-    binary_dict = find_location_names(region_size)
-    culture = list(binary_dict.keys())[0]
-    new_list = list(binary_dict.values())[0] #Returns list within list
+    town_size = np.random.randint(5, 55)
+    names_list = load_names(town_size)
+    binary_dict, culture, new_list = names_list[0],  names_list[1],  names_list[2]
     print("Culture of the new region is {} and the following towns {}".format(culture, new_list))
     print(new_list[0], str(culture))
     print(binary_dict)
     tree = nx.Graph()
     object_tree = nx.Graph()
-    for i in range(region_size):
+    for i in range(town_size):
         distance = np.random.randint(3,12)
         settlment_type = np.random.randint(4,7)
         connections = np.random.randint(1,4)
@@ -69,7 +81,7 @@ def initialise_regions():
         other_town = list(tree.nodes)
 
         town = new_list[i]
-        holding = Holding(name=town, culture = culture, settlement_type = Holding.get_type(town, settlment_type, culture))
+        holding = Holding(name=town, culture = culture, settlement_type = Holding.get_town_type(town, settlment_type, culture))
         object_tree.add_node(holding.name)
         if object_tree.number_of_nodes() > 3:
             print("Tree has {} nodes".format(len(list(object_tree.nodes))))
@@ -90,4 +102,11 @@ def initialise_regions():
     nx.draw_networkx_edge_labels(object_tree,pos=nx.spring_layout(object_tree), label_pos=0.2, rotate=False, font_size=5 )
     plt.show()
 
-initialise_regions()
+def load_names(size_arg):
+    binary_dict = find_location_names(size_arg)
+    culture = list(binary_dict.keys())[0]
+    new_list = list(binary_dict.values())[0] #Returns list within list
+    objects = [binary_dict, culture, new_list]
+    return objects
+
+initialise_holdings()
