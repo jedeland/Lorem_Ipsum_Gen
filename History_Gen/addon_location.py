@@ -64,12 +64,33 @@ def initialise_regions():
     output_list = load_names(region_size)
     new_dict, culture, new_list = output_list[0], output_list[1], output_list[2]
     regions_set = set([])
+    nxgraph = nx.Graph()
     for i in range(region_size):
-
-
-
-        nxgraph = nx.Graph()
         region = Region(name=new_list[i], culture= culture, settlement_type= Region.get_region_type(new_list[i], settlement_type, culture))
+        nxgraph.add_node(region)
+        print("List contains : ", list(nxgraph.nodes))
+        temp_list = list(nxgraph.nodes)
+        print(nxgraph.number_of_nodes())
+        if nxgraph.number_of_nodes() >= 1:
+            nxgraph.add_edge(region, temp_list[i-1])
+            print("This should add edges")
+        if nxgraph.number_of_nodes() >= 3:
+            print("There are over 3 nodes")
+            try:
+                for g in range(np.random.randint(1, 3)):
+                    print("adding connection between region and node {} : {}".format(g, temp_list[g]))
+                    nxgraph.add_edge(region, temp_list[g-1])
+
+            except Exception as e:
+                print("Exception found" , e)
+                pass
+    plt.figure()
+
+    # nx.draw_networkx(tree)
+    # nx.draw_networkx_edge_labels(tree, pos=nx.spring_layout(tree), label_pos=0.7, rotate=False, font_size=5)
+    nx.draw_networkx(nxgraph)
+
+    plt.show()
     #TODO: make graph made up of holding graphs
 
 
@@ -120,4 +141,4 @@ def load_names(size_arg):
     objects = [binary_dict, culture, new_list]
     return objects
 
-initialise_holdings()
+initialise_regions()
