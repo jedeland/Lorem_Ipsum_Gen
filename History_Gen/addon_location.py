@@ -59,7 +59,18 @@ def initialise_regions():
     #Use dictionary to create regions that hold an NX graph and subdictionary containing the holdings relative to a region
     #regions are a division of a kingdom
     region_size = np.random.randint(5, 11)
-    binary_dict = load_names(region_size)
+    settlement_type = np.random.randint(1, 3)
+    #TODO: Add long individual names, so that it creates each region with the same culture
+    output_list = load_names(region_size)
+    new_dict, culture, new_list = output_list[0], output_list[1], output_list[2]
+    regions_set = set([])
+    for i in range(region_size):
+
+
+
+        nxgraph = nx.Graph()
+        region = Region(name=new_list[i], culture= culture, settlement_type= Region.get_region_type(new_list[i], settlement_type, culture))
+    #TODO: make graph made up of holding graphs
 
 
 
@@ -75,13 +86,13 @@ def initialise_holdings():
     object_tree = nx.Graph()
     for i in range(town_size):
         distance = np.random.randint(3,12)
-        settlment_type = np.random.randint(4,7)
+        settlement_type = np.random.randint(4,7)
         connections = np.random.randint(1,4)
 
         other_town = list(tree.nodes)
 
         town = new_list[i]
-        holding = Holding(name=town, culture = culture, settlement_type = Holding.get_town_type(town, settlment_type, culture))
+        holding = Holding(name=town, culture = culture, settlement_type = Holding.get_town_type(town, settlement_type, culture))
         object_tree.add_node(holding.name)
         if object_tree.number_of_nodes() > 3:
             print("Tree has {} nodes".format(len(list(object_tree.nodes))))
