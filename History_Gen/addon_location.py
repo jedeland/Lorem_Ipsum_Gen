@@ -67,25 +67,29 @@ def initialise_regions():
     nxgraph = nx.Graph()
     for i in range(region_size):
         region = Region(name=new_list[i], culture= culture, settlement_type= Region.get_region_type(new_list[i], settlement_type, culture))
-        nxgraph.add_node(region)
+        region_dict = {"Name": region.name, "Object": region}
+        print("Adding node : {} {}".format(region.name, region_dict))
+        nxgraph.add_node(region.name, attr_dict=region_dict)
         print("List contains : ", list(nxgraph.nodes))
         temp_list = list(nxgraph.nodes)
         print(nxgraph.number_of_nodes())
         if nxgraph.number_of_nodes() >= 1:
-            nxgraph.add_edge(region, temp_list[i-1])
+            nxgraph.add_edge(region.name, temp_list[i-1])
             print("This should add edges")
         if nxgraph.number_of_nodes() >= 3:
             print("There are over 3 nodes")
             try:
                 for g in range(np.random.randint(1, 3)):
                     print("adding connection between region and node {} : {}".format(g, temp_list[g]))
-                    nxgraph.add_edge(region, temp_list[g-1])
+                    nxgraph.add_edge(region.name, temp_list[g-1])
 
             except Exception as e:
                 print("Exception found" , e)
                 pass
     plt.figure()
-
+    node_list = list(nxgraph.nodes.data())
+    print(node_list)
+    print(node_list[node_list[-1]])
     # nx.draw_networkx(tree)
     # nx.draw_networkx_edge_labels(tree, pos=nx.spring_layout(tree), label_pos=0.7, rotate=False, font_size=5)
     nx.draw_networkx(nxgraph)
