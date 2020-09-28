@@ -17,15 +17,21 @@ def input_flow():
         else:
             #YAML file should follow this format: Name of file as the tree node -> Event ID -> List containing event text and effect
             print("Creating new file")
-            input_done = False
+            input_done = True
             yaml_file_dict = {}
-            while input_done is not True:
-                print("Input the event title and the description text, Followed by the impact - Type 'list' to see the possible impacts")
-                title_input = str(input("Event ID: "))
-                text_input = str(input("Event Text: "))
-                text_input = "'{}'".format(text_input)
-                impact_input = str(input("Impact: "))
-                yaml_file_dict.update({title_input: [text_input, impact_input]})
+            print("Press CTR+C to quit, this will save the event file")
+            print("Input the event title and the description text, Followed by the impact - Type 'list' to see the possible impacts")
+            while input_done:
+                try:
+
+                    #TODO: add user quit option
+                    title_input = str(input("Event ID: "))
+                    text_input = str(input("Event Text: "))
+                    text_input = "'{}'".format(text_input)
+                    impact_input = str(input("Impact: "))
+                    yaml_file_dict.update({title_input: [text_input, impact_input]})
+                except KeyboardInterrupt:
+                    break
             print(yaml_file_dict)
             yaml_file_arg = {section_in: yaml_file_dict}
             print(yaml_file_dict)
@@ -35,7 +41,13 @@ def input_flow():
 
     else:
         os.mkdir(section_in)
+def check_input(loop_boolean):
+    text = str(input("Event ID: "))
+    if text.lower() == "quit":
+        loop_boolean = True
 
+    else:
+        return text
 
 
 
