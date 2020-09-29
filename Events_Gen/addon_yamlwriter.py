@@ -17,24 +17,29 @@ def input_flow():
         else:
             #YAML file should follow this format: Name of file as the tree node -> Event ID -> List containing event text and effect
             print("Creating new file")
-            input_done = True
+            input_continue = True
             yaml_file_dict = {}
             print("Press CTR+C to quit, this will save the event file")
             print("Input the event title and the description text, Followed by the impact - Type 'list' to see the possible impacts")
-            while input_done:
+            while input_continue:
                 try:
 
-                    #TODO: add user quit option
+                    #TODO: Add user hash option for event ID
                     title_input = str(input("Event ID: "))
                     text_input = str(input("Event Text: "))
                     text_input = "'{}'".format(text_input)
                     impact_input = str(input("Impact: "))
                     yaml_file_dict.update({title_input: [text_input, impact_input]})
-                except KeyboardInterrupt:
-                    break
+                    quit_input = str(input("To continue press enter, to quit type 'quit'"))
+                    if quit_input.lower() == "quit":
+                        input_continue = False
+                except Exception as e:
+                    print("Invalid input")
+                    pass
             print(yaml_file_dict)
             yaml_file_arg = {section_in: yaml_file_dict}
             print(yaml_file_dict)
+            yaml.dump(yaml_file_arg)
 
 
 
