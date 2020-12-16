@@ -479,7 +479,7 @@ def create_duplicate_names(df, add_last_names, remove_or_add):
     df.to_excel("names_merged.xlsx", index=False)
 
     return df
-
+#yes
 
 def npc_data_exists(exists):
     if exists:
@@ -491,5 +491,5 @@ def npc_data_exists(exists):
         df = addon_namegen.splice_names()
         npc_options()
 
-
+#TODO: Add option importing names from addon_namegen.py using find location names function
 npc_options()
