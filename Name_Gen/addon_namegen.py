@@ -878,11 +878,13 @@ def move_to_sql():
 def get_sql_names():
     try:
         conn = sqlite3.connect("names_merged.db")
-        c = conn.cursor()
-        new_df = pd.read_sql(sql='SELECT * FROM NAMES', con=conn)
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        print(cursor.fetchall())
+        new_df = pd.read_sql_query(sql="SELECT * FROM 'NAMES'", con=conn)
         return new_df
-    except:
-        print("Something went wrong")
+    except Exception as e:
+        print("Something went wrong", e)
 
 def find_location_names(number_of_values=10):
     #TODO: Create alternative that copies the gen_townnames_.db from this directory to the history gen directoy, using try and except
