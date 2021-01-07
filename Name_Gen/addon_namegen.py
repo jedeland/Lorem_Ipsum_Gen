@@ -899,7 +899,7 @@ def find_location_names(number_of_values=10, user_arg="France"):
     'Romania', 'Russia', 'Serbia', 'Slovakia', 'Slovenia',
     'Spain', 'Sweden', 'Switzerland','Turkey',
     'Ukraine', 'United Kingdom']
-    df = df[df["Origin"].isin(european_group)]
+    #df = df[df["Origin"].isin(european_group)]
 
     #df_culture = df[df["Origin"] == random.choice(pd.unique(df["Origin"]))]
     df_culture = df[df["Origin"] == user_arg]
@@ -910,5 +910,5 @@ def find_location_names(number_of_values=10, user_arg="France"):
     return location_dict
 
 
-locations = find_location_names(10, "France")
+locations = find_location_names(20, "France")
 print(locations)
