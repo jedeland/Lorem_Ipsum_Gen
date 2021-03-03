@@ -89,7 +89,7 @@ def initialise_regions():
     plt.figure()
     node_list = list(nxgraph.nodes.data())
     print(node_list)
-    print(node_list[node_list[-1]])
+    #print(node_list[node_list[-1]])
     # nx.draw_networkx(tree)
     # nx.draw_networkx_edge_labels(tree, pos=nx.spring_layout(tree), label_pos=0.7, rotate=False, font_size=5)
     nx.draw_networkx(nxgraph)
