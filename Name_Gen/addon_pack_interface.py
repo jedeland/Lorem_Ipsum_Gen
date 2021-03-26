@@ -38,6 +38,11 @@ def npc_options():
                 try:
                     conn = sqlite3.connect("names_merged.db")
                     df_arg = pd.read_sql_query(sql="SELECT * FROM NAMES", con=conn)
+                    cur = conn.cursor()
+                    output = cur.execute("SELECT DISTINCT origin FROM NAMES")
+                    print(list(output))
+
+
                 except Exception as e:
                     print("SQL file didnt work, using backup", e)
                     df_arg = pd.read_excel("names_merged.xlsx")
@@ -95,11 +100,13 @@ def npc_options():
                 #union_text_list = [af_tag, arb_tag, as_tag, euro_tag, fantasy_tag]
                 drop_list = []
                 for i in union_list:
-
                     for item in i:
                         df_temp = df_arg.loc[df_arg["origin"] == item]
-                        #print(df_temp)
+
+
                         if len(pd.unique(df_temp["tag"])) == 1:
+                            print(df_temp)
+                            print(item)
                             drop_list.append(item)
                             i.remove(item)
                         else:
@@ -125,10 +132,11 @@ def npc_options():
                     print(non_relevant)
                     df_arg = create_duplicate_names(df_arg, non_relevant_last, non_relevant)
                     temp = df_arg[(df_arg["origin"] == "Ethiopia")]
-                    print(pd.unique(temp["tag"]))
+                    print("Here are the unique tags! : ", pd.unique(temp["tag"]))
                 #Used later to ensure there is always a quit option
                 #Assigns cultural lists to regions
-
+                print(df_arg)
+                df_arg.to_sql("names_merged.db", con=conn, if_exists='replace')
                 regions = {"African": africa, "Europe": europe,"Near East": arabia, "Asia": asia, "Experimental: Fantasy": fantasy}
 
                 print("Type the number of NPC's you wish to create: ")
@@ -368,7 +376,7 @@ def show_npc(df, nations, num_npcs):
             rand_name = df.loc[(df["tag"] == "F") | (df["tag"] == "NN") | (df["tag"] == "WF")]
             gender_in = "F"
             pyside_df = append_npc(gender_tags, neutral_genders, pyside_df, rand_name, rand_surname, gender_in)
-    print(pyside_df)
+    #print(pyside_df)
     return pyside_df
 
 
@@ -445,9 +453,9 @@ def create_duplicate_names(df, add_last_names, remove_or_add):
     #The URL's below are ones that where non valid, but i found over time new information to make them usable, add any other non valid files here, this could be done in the namegen file
     #But since it is so few results currently it seems like a waste to restart the entire creation process
     url_dict = {"African": "https://fr.wiktionary.org/wiki/Annexe:Liste_de_pr%C3%A9noms_b%C3%A9t%C3%A9", "Yoruba": "https://en.wikipedia.org/wiki/Category:Yoruba_given_names",
-                "Ethiopia": "https://en.wikipedia.org/wiki/Category:Ethiopian_given_names", "Hawaiian": "https://en.wiktionary.org/wiki/Category:Hawaiian_male_given_names",
-                "Hawf": "https://en.wiktionary.org/w/index.php?title=Category:Hawaiian_female_given_names&pageuntil=POLI%CA%BBAHU%0APoli%CA%BBahu#mw-pages"}
-    name_fin = ["Zobe", "Yinka", "Zewde", "ʻŌpūnui", "Piʻilani"]
+                "Ethiopia": "https://en.wikipedia.org/wiki/Category:Ethiopian_given_names",
+                }
+    name_fin = ["Zobe", "Yinka", "Zewde"]
     df = addon_namegen.add_stragglers(df, url_dict, name_fin)
     if "Unisex" in add_last_names:
         add_last_names.remove("Unisex")
