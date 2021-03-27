@@ -40,6 +40,7 @@ def npc_options():
                     df_arg = pd.read_sql_query(sql="SELECT * FROM NAMES", con=conn)
                     cur = conn.cursor()
                     output = cur.execute("SELECT DISTINCT origin FROM NAMES")
+                    print(df_arg.loc[df_arg["origin"] == "African"])
                     print(list(output))
 
 
@@ -136,7 +137,10 @@ def npc_options():
                 #Used later to ensure there is always a quit option
                 #Assigns cultural lists to regions
                 print(df_arg)
-                df_arg.to_sql("names_merged.db", con=conn, if_exists='replace')
+                conn2 = sqlite3.connect("names_merged_.db")
+                df_arg.to_sql("NAMES", if_exists='replace', con=conn)
+                df_arg.to_sql("NAMES", if_exists='replace', con=conn2)
+                print(df_arg.loc[df_arg["origin"] == "African"])
                 regions = {"African": africa, "Europe": europe,"Near East": arabia, "Asia": asia, "Experimental: Fantasy": fantasy}
 
                 print("Type the number of NPC's you wish to create: ")
